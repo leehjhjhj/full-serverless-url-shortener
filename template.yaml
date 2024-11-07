@@ -6,10 +6,13 @@ Description: >
 Parameters:
   DomainName:
     Type: String
+    Default:
   HostedZoneName:
     Type: String
+    Default:
   CertificateArn:
     Type: String
+    Default:
     Description: ARN of ACM certificate
 
 Globals:
@@ -47,7 +50,7 @@ Resources:
     Properties:
       FunctionName: create-url
       CodeUri: functions/
-      Handler: create.lambda_handler
+      Handler: functions.create.app.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
@@ -70,14 +73,16 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: redirect-url
-      CodeUri: functions/
-      Handler: redirect.lambda_handler
+      CodeUri: ./
+      Handler: functions.redirect.app.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
       Environment:
         Variables:
           TABLE_NAME: !Ref UrlTable
+          REGION: ap-northeast-2
+          PYTHONPATH: /var/task
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UrlTable
