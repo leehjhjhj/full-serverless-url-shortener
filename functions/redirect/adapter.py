@@ -20,16 +20,17 @@ class RedirectDynamoDBPort(RedirectPort):
         self._table_name = table_name
         self._table = self._dynamo_client.Table(self._table_name) 
 
-    def find(self, hash_value: str):
+    def find(self, hash_value: str) -> OriginUrlData:
         response = self._table.query(
             KeyConditionExpression=Key('hash').eq(hash_value)
         )
         items = response.get('Items', [])
         if not items:
             raise NotFoundException
-
+        item: dict = items[0]
         return OriginUrlData(
-            origin_url=items[0].get('ou')
+            origin_url=item.get('ou'),
+            on=item.get('on')
         )
     
     def save(self):

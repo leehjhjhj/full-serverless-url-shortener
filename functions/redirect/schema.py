@@ -5,3 +5,4 @@ class RedirectRequest(BaseModel):
 
 class OriginUrlData(BaseModel):
     origin_url: str
+    on: bool
