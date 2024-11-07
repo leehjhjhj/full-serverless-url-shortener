@@ -13,7 +13,7 @@ def lambda_handler(event, context):
             status_code=302,
             headers={
                 'Location': url,
-                'Cache-Control': 'public, max-age=86400'
+                'Cache-Control': 'no-store, no-cache'
             }
         ).to_dict()
     except NotFoundException as e:
