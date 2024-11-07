@@ -3,6 +3,7 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from datetime import datetime, timedelta
 from functions.redirect.schema import OriginUrlData
+from functions.common.exceptions import NotFoundException
 
 class RedirectPort(ABC):
     @abstractmethod
@@ -23,8 +24,10 @@ class RedirectDynamoDBPort(RedirectPort):
         response = self._table.query(
             KeyConditionExpression=Key('hash').eq(hash_value)
         )
-        
         items = response.get('Items', [])
+        if not items:
+            raise NotFoundException
+
         return OriginUrlData(
             origin_url=items[0].get('ou')
         )
