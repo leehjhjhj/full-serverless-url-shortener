@@ -8,8 +8,14 @@ def lambda_handler(event, context):
         container = RedirectContainer.get_instance()
         hash_value = event['pathParameters']['hash']
         request = RedirectRequest(hash_value=hash_value)
-        response = container.service.connect_url(request)
-        return response
+        url = container.service.connect_url(request)
+        return LambdaResponse(
+            status_code=302,
+            headers={
+                'Location': url,
+                'Cache-Control': 'public, max-age=86400'
+            }
+        ).to_dict()
     except NotFoundException as e:
         return LambdaResponse(
                 status_code=404,
@@ -24,7 +30,7 @@ def lambda_handler(event, context):
 
 event = {
     "pathParameters": {
-        "hash": "1"
+        "hash": "test"
     }
 }
 print(lambda_handler(event, ""))
