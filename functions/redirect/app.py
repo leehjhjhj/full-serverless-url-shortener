@@ -1,7 +1,7 @@
 from functions.redirect.container import RedirectContainer
 from functions.redirect.schema import RedirectRequest
 from functions.common.response import LambdaResponse
-from functions.common.exceptions import NotFoundException
+from functions.common.exceptions import NotFoundException, ForbiddenException
 
 def lambda_handler(event, context):
     try:
@@ -19,6 +19,11 @@ def lambda_handler(event, context):
     except NotFoundException as e:
         return LambdaResponse(
                 status_code=404,
+                body={'error': e.message}
+            ).to_dict()
+    except ForbiddenException as e:
+        return LambdaResponse(
+                status_code=403,
                 body={'error': e.message}
             ).to_dict()
     except Exception as e:
