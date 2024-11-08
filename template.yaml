@@ -6,13 +6,13 @@ Description: >
 Parameters:
   DomainName:
     Type: String
-    Default:
+    Default: 
   HostedZoneName:
     Type: String
-    Default:
+    Default: 
   CertificateArn:
     Type: String
-    Default:
+    Default: 
     Description: ARN of ACM certificate
 
 Globals:
@@ -33,13 +33,30 @@ Resources:
       AttributeDefinitions:
         - AttributeName: hash
           AttributeType: S
-        - AttributeName: id
+        - AttributeName: ou
+          AttributeType: S
+        - AttributeName: ui
+          AttributeType: S
+        - AttributeName: ca
           AttributeType: N
       KeySchema:
         - AttributeName: hash
           KeyType: HASH
-        - AttributeName: id
-          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: url-index
+          KeySchema:
+            - AttributeName: ou
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+        - IndexName: user-index
+          KeySchema:
+            - AttributeName: ui
+              KeyType: HASH
+            - AttributeName: ca
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
       TimeToLiveSpecification:
         AttributeName: ttl
