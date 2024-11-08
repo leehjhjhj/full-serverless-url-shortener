@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import boto3
 from boto3.dynamodb.conditions import Key
-from functions.common.common_schema import DataDto
+from functions.common.common_schema import UrlSchema
 from functions.common.exceptions import NotFoundException
 
 class RedirectPort(ABC):
@@ -19,7 +19,7 @@ class RedirectDynamoDBPort(RedirectPort):
         self._table_name = table_name
         self._table = self._dynamo_client.Table(self._table_name) 
 
-    def find(self, hash_value: str) -> DataDto:
+    def find(self, hash_value: str) -> UrlSchema:
         response: dict = self._table.get_item(
             Key={
                 'hash': hash_value
@@ -28,9 +28,9 @@ class RedirectDynamoDBPort(RedirectPort):
         item: dict = response.get('Item')
         if not item:
             raise NotFoundException
-        return DataDto(**item)
+        return UrlSchema(**item)
     
-    def save(self, data: DataDto):
+    def save(self, data: UrlSchema):
         item = {
             **data.model_dump(by_alias=True)
         }
