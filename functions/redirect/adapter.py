@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import boto3
 from boto3.dynamodb.conditions import Key
-from functions.redirect.schema import DataDto
+from functions.common.common_schema import DataDto
 from functions.common.exceptions import NotFoundException
 
 class RedirectPort(ABC):
