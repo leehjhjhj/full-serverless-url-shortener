@@ -20,13 +20,14 @@ class RedirectDynamoDBPort(RedirectPort):
         self._table = self._dynamo_client.Table(self._table_name) 
 
     def find(self, hash_value: str) -> DataDto:
-        response = self._table.query(
-            KeyConditionExpression=Key('hash').eq(hash_value)
+        response: dict = self._table.get_item(
+            Key={
+                'hash': hash_value
+            }
         )
-        items = response.get('Items', [])
-        if not items:
+        item: dict = response.get('Item')
+        if not item:
             raise NotFoundException
-        item: dict = items[0]
         return DataDto(**item)
     
     def save(self, data: DataDto):
