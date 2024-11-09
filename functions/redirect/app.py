@@ -29,8 +29,7 @@ def lambda_handler(event, context):
     except Exception as e:
         print(e)
         return LambdaResponse(
-            status_code=500,
-            message="Internal server error"
+            status_code=500
         ).to_dict()
 
 event = {
