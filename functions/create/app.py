@@ -6,15 +6,13 @@ import json
 
 def lambda_handler(event, context):
     try:
-        # body = json.loads(event['body'])
-        body = event['body']
+        body = json.loads(event['body'])
         request = CreateRequest(**body)
         container = CreateContainer.get_instance()
         hash_value = container.service.create_hash(request)
         return LambdaResponse(
             status_code=201,
-            message="success",
-            body={'hashValue': hash_value}
+            body=json.dumps({'hashValue': hash_value}) 
         ).to_dict()
     except NotFoundException as e:
         return LambdaResponse(
@@ -29,6 +27,5 @@ def lambda_handler(event, context):
     except Exception as e:
         print(e)
         return LambdaResponse(
-            status_code=500,
-            message="Internal server error"
+            status_code=500
         ).to_dict()
