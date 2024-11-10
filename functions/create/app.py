@@ -17,12 +17,12 @@ def lambda_handler(event, context):
     except NotFoundException as e:
         return LambdaResponse(
                 status_code=404,
-                body={'error': e.message}
+                body=json.dumps({'error': e.message})
             ).to_dict()
     except AlreadyExistException as e:
         return LambdaResponse(
                 status_code=400,
-                body={'error': e.message}
+                body=json.dumps({'error': e.message})
             ).to_dict()
     except Exception as e:
         print(e)

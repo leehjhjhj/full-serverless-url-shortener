@@ -4,7 +4,7 @@ from typing import Dict, Optional
     
 class LambdaResponse(BaseModel):
     status_code: Optional[int] = Field(..., serialization_alias="statusCode")
-    body: Optional[Dict[str, str]] = None
+    body: Optional[str] = None
     headers: Dict[str, str] = {"Content-Type": "application/json"}
     
     def to_dict(self) -> dict:
