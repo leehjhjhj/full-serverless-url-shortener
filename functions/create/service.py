@@ -1,6 +1,6 @@
 from functions.create.adapter import CreatePort
 from functions.create.schema import CreateRequest
-from functions.common.exceptions import AlreadyExistException
+from functions.common.exceptions import AlreadyExistException, TooLongExceiption
 from functions.common.common_schema import UrlSchema
 from datetime import datetime
 import time
@@ -15,7 +15,8 @@ class CreatetService:
         hoping_hash = request.hoping_hash
         if self._adapter.find_origin(request.origin_url):
             raise AlreadyExistException
-        if hoping_hash and self._check_exist_hash(hoping_hash):
+        if hoping_hash is not None:
+            self._check_hoping_hash(hoping_hash)
             hash_value = hoping_hash
         else:
             hash_value = self._make_hash()
@@ -36,9 +37,11 @@ class CreatetService:
         base62_str = ''.join(reversed(result))[-7:].rjust(7, '0')
         return base62_str
     
-    def _check_exist_hash(self, hoping_hash: str) -> bool:
-        return self._adapter.find_hash(hoping_hash)
-
+    def _check_hoping_hash(self, hoping_hash: str) -> bool:
+        if len(hoping_hash) > 7 :
+            raise TooLongExceiption
+        if self._adapter.find_hash(hoping_hash):
+            raise AlreadyExistException
     def _get_epoch_milliseconds(self) -> int:
         return int(time.time() * 1000)
     
