@@ -1,7 +1,11 @@
 from functions.create.container import CreateContainer
 from functions.create.schema import CreateRequest
 from functions.common.response import LambdaResponse
-from functions.common.exceptions import NotFoundException, AlreadyExistException
+from functions.common.exceptions import (
+    NotFoundException,
+    AlreadyExistException,
+    TooLongExceiption
+)
 import json
 
 def lambda_handler(event, context):
@@ -20,6 +24,11 @@ def lambda_handler(event, context):
                 body=json.dumps({'error': e.message})
             ).to_dict()
     except AlreadyExistException as e:
+        return LambdaResponse(
+                status_code=400,
+                body=json.dumps({'error': e.message})
+            ).to_dict()
+    except TooLongExceiption as e:
         return LambdaResponse(
                 status_code=400,
                 body=json.dumps({'error': e.message})

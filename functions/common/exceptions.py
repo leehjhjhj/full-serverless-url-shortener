@@ -12,3 +12,9 @@ class AlreadyExistException(Exception):
     def __init__(self, message="Url already existed"):
         self.message = message
         super().__init__(self.message)
+
+
+class TooLongExceiption(Exception):
+    def __init__(self, message="Hopong hash too long"):
+        self.message = message
+        super().__init__(self.message)
