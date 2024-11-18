@@ -18,15 +18,23 @@ def lambda_handler(event, context):
             }
         ).to_dict()
     except NotFoundException as e:
+        print(e)
         return LambdaResponse(
-                status_code=404,
-                body=json.dumps({'error': e.message})
-            ).to_dict()
+            status_code=302,
+            headers={
+                'Location': "https://takemm.com",
+                'Cache-Control': 'no-store, no-cache'
+            }
+        ).to_dict()
     except ForbiddenException as e:
+        print(e)
         return LambdaResponse(
-                status_code=403,
-                body=json.dumps({'error': e.message})
-            ).to_dict()
+            status_code=302,
+            headers={
+                'Location': "https://takemm.com",
+                'Cache-Control': 'no-store, no-cache'
+            }
+        ).to_dict()
     except Exception as e:
         print(e)
         return LambdaResponse(

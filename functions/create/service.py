@@ -25,13 +25,13 @@ class CreatetService:
         return hash_value
 
     def _make_hash(self) -> str:
-        CHARSET = string.digits + string.ascii_uppercase + string.ascii_lowercase
+        CHARSET = '23456789' + 'ABCDEFGHJKLMNPQRSTUVWXYZ' + 'abcdefghjkmnpqrstuvwxyz'
         timestamp = self._get_epoch_milliseconds()
         random_bits = random.randint(0, 999)
         combined = (timestamp * 1000) + random_bits
         result = []
         while combined:
-            combined, remainder = divmod(combined, 62)
+            combined, remainder = divmod(combined, 55)
             result.append(CHARSET[remainder])
         
         base62_str = ''.join(reversed(result))[-7:].rjust(7, '0')

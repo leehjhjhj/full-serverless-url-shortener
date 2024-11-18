@@ -74,7 +74,8 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref UrlTable
-          DOMAIN: !Ref DomainName
+          REGION: ap-northeast-2
+          PYTHONPATH: /var/task
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UrlTable
