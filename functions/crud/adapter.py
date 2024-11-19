@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import boto3
 from typing import Optional
+from functions.crud.schema import UpdateRequest
 
 class CrudPort(ABC):
 
@@ -14,6 +15,10 @@ class CrudPort(ABC):
 
     @abstractmethod
     def find_all(self, last_evaluated_key: dict = None):
+        pass
+
+    @abstractmethod
+    def save(self):
         pass
 
 class CrudDynamoDBPort(CrudPort):
@@ -53,3 +58,9 @@ class CrudDynamoDBPort(CrudPort):
         response = self._table.scan(**scan_kwargs)
         
         return response.get('Items', []), response.get('LastEvaluatedKey')
+    
+    def save(self, data: UpdateRequest) -> None:
+        item = {
+            **data.model_dump(by_alias=True)
+        }
+        self._table.put_item(Item=item)
