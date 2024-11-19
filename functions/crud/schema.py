@@ -26,3 +26,6 @@ class UpdateRequest(BaseModel):
     count: int = Field(default=0)
     on: bool = Field(default=True)
     title: Optional[str] = Field(default=None, serialization_alias='ti')
+
+class DeleteRequest(BaseModel):
+    hash_value: str = Field(..., serialization_alias='hash', alias='hash')
