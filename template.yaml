@@ -7,6 +7,9 @@ Parameters:
   DomainName:
     Type: String
     Default: 
+  APIDomainName:
+    Type: String
+    Default: 
   HostedZoneName:
     Type: String
     Default: 
@@ -14,6 +17,17 @@ Parameters:
     Type: String
     Default: 
     Description: ARN of ACM certificate
+  TableName:
+    Type: String
+    Default: url-saver
+  CreateTable:
+    Type: String
+    Default: false
+    AllowedValues: [true, false]
+    Description: Whether to create a new DynamoDB table
+
+Conditions:
+  ShouldCreateTable: !Equals [!Ref CreateTable, 'true']
 
 Globals:
   Function:
@@ -28,6 +42,8 @@ Globals:
 Resources:
   UrlTable:
     Type: AWS::DynamoDB::Table
+    Condition: ShouldCreateTable
+    DeletionPolicy: Retain
     Properties:
       TableName: url-saver
       AttributeDefinitions:
@@ -73,17 +89,18 @@ Resources:
         - x86_64
       Environment:
         Variables:
-          TABLE_NAME: !Ref UrlTable
+          TABLE_NAME: !Ref TableName
+          DOMAIN: !Ref APIDomainName
           REGION: ap-northeast-2
-          PYTHONPATH: /var/task
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref UrlTable
+            TableName: !Ref TableName
+        - AmazonAPIGatewayAdministrator
       Events:
         CreateUrl:
           Type: Api
           Properties:
-            RestApiId: !Ref ApiGatewayApi
+            RestApiId: !Ref ApiGatewayApi2
             Path: /url
             Method: POST
 
@@ -98,12 +115,14 @@ Resources:
         - x86_64
       Environment:
         Variables:
-          TABLE_NAME: !Ref UrlTable
+          TABLE_NAME: !Ref TableName
           REGION: ap-northeast-2
           PYTHONPATH: /var/task
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref UrlTable
+            TableName: !Ref TableName
+        - AmazonAPIGatewayAdministrator
+        
       Events:
         RedirectUrl:
           Type: Api
@@ -111,8 +130,78 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /{hash}
             Method: GET
-  
+
+  CrudFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: crud-url
+      CodeUri: ./
+      Handler: functions.crud.app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          REGION: ap-northeast-2
+          PYTHONPATH: /var/task
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableName
+      Events:
+        UpdateUrl:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi2
+            Path: /update
+            Method: PUT
+        GetUrl:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi2
+            Path: /get
+            Method: GET
+        GetAllUrl:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi2
+            Path: /get-all
+            Method: POST
+        DeleteUrl:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi2
+            Path: /delete
+            Method: DELETE
+
+  DnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Ref HostedZoneName
+      Name: !Ref DomainName
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt ApiGatewayDomainName.RegionalDomainName
+        HostedZoneId: !GetAtt ApiGatewayDomainName.RegionalHostedZoneId
+
+  DnsRecord2:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Ref HostedZoneName
+      Name: !Ref APIDomainName
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt ApiGatewayDomainName.RegionalDomainName
+        HostedZoneId: !GetAtt ApiGatewayDomainName.RegionalHostedZoneId
+
   ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      EndpointConfiguration: 
+        Type: REGIONAL
+
+  ApiGatewayApi2:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
@@ -128,6 +217,16 @@ Resources:
         Types: 
           - REGIONAL
       SecurityPolicy: TLS_1_2
+
+  ApiGatewayDomainName2:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !Ref APIDomainName
+      RegionalCertificateArn: !Ref CertificateArn
+      EndpointConfiguration:
+        Types: 
+          - REGIONAL
+      SecurityPolicy: TLS_1_2
   
   ApiGatewayMapping:
     Type: AWS::ApiGateway::BasePathMapping
@@ -138,20 +237,13 @@ Resources:
       DomainName: !Ref DomainName
       RestApiId: !Ref ApiGatewayApi
       Stage: Prod
-  DnsRecord:
-    Type: AWS::Route53::RecordSet
+
+  ApiGatewayMapping2:
+    Type: AWS::ApiGateway::BasePathMapping
+    DependsOn:
+      - ApiGatewayApi2
+      - ApiGatewayDomainName2
     Properties:
-      HostedZoneName: !Ref HostedZoneName
-      Name: !Ref DomainName
-      Type: A
-      AliasTarget:
-        DNSName: !GetAtt ApiGatewayDomainName.RegionalDomainName
-        HostedZoneId: !GetAtt ApiGatewayDomainName.RegionalHostedZoneId
-  
-Outputs:
-  ApiUrl:
-    Description: API Gateway endpoint URL
-    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
-  CustomDomainUrl:
-    Description: Custom Domain URL
-    Value: !Sub "https://${DomainName}"
+      DomainName: !Ref APIDomainName
+      RestApiId: !Ref ApiGatewayApi2
+      Stage: Prod
