@@ -17,6 +17,17 @@ Parameters:
     Type: String
     Default: 
     Description: ARN of ACM certificate
+  TableName:
+    Type: String
+    Default: url-saver
+  CreateTable:
+    Type: String
+    Default: false
+    AllowedValues: [true, false]
+    Description: Whether to create a new DynamoDB table
+
+Conditions:
+  ShouldCreateTable: !Equals [!Ref CreateTable, 'true']
 
 Globals:
   Function:
@@ -31,6 +42,7 @@ Globals:
 Resources:
   UrlTable:
     Type: AWS::DynamoDB::Table
+    Condition: ShouldCreateTable
     DeletionPolicy: Retain
     Properties:
       TableName: url-saver
@@ -77,12 +89,12 @@ Resources:
         - x86_64
       Environment:
         Variables:
-          TABLE_NAME: !Ref UrlTable
+          TABLE_NAME: !Ref TableName
           DOMAIN: !Ref APIDomainName
           REGION: ap-northeast-2
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref UrlTable
+            TableName: !Ref TableName
         - AmazonAPIGatewayAdministrator
       Events:
         CreateUrl:
@@ -103,12 +115,12 @@ Resources:
         - x86_64
       Environment:
         Variables:
-          TABLE_NAME: !Ref UrlTable
+          TABLE_NAME: !Ref TableName
           REGION: ap-northeast-2
           PYTHONPATH: /var/task
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref UrlTable
+            TableName: !Ref TableName
         - AmazonAPIGatewayAdministrator
         
       Events:
@@ -130,19 +142,19 @@ Resources:
         - x86_64
       Environment:
         Variables:
-          TABLE_NAME: !Ref UrlTable
+          TABLE_NAME: !Ref TableName
           REGION: ap-northeast-2
           PYTHONPATH: /var/task
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref UrlTable
+            TableName: !Ref TableName
       Events:
         UpdateUrl:
           Type: Api
           Properties:
             RestApiId: !Ref ApiGatewayApi2
             Path: /update
-            Method: POST
+            Method: PUT
         GetUrl:
           Type: Api
           Properties:
