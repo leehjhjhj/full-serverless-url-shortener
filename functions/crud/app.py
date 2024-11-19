@@ -3,7 +3,7 @@ from functions.common.response import LambdaResponse
 from functions.common.exceptions import (
     NotFoundException
 )
-from functions.crud.schema import UpdateRequest
+from functions.crud.schema import UpdateRequest, DeleteRequest
 import json
 from typing import Optional
 
@@ -33,6 +33,13 @@ def lambda_handler(event, context):
             container.service.update_url(request)
             return LambdaResponse(
                 status_code=200
+            ).to_dict()
+        elif http_method == 'DELETE' and path == '/delete':
+            body = json.loads(event['body'])
+            request = DeleteRequest(**body)
+            container.service.delete_url(request)
+            return LambdaResponse(
+                status_code=204
             ).to_dict()
         else:
             return LambdaResponse(
