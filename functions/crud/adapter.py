@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import boto3
 from typing import Optional
-from functions.crud.schema import UpdateRequest
+from functions.crud.schema import UpdateRequest, DeleteRequest
 
 class CrudPort(ABC):
 
@@ -19,6 +19,10 @@ class CrudPort(ABC):
 
     @abstractmethod
     def save(self):
+        pass
+
+    @abstractmethod
+    def delete(self):
         pass
 
 class CrudDynamoDBPort(CrudPort):
@@ -64,3 +68,10 @@ class CrudDynamoDBPort(CrudPort):
             **data.model_dump(by_alias=True)
         }
         self._table.put_item(Item=item)
+
+    def delete(self, data: DeleteRequest) -> None:
+        self._table.delete_item(
+            Key={
+                **data.model_dump(by_alias=True)
+            }
+        )
