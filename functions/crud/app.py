@@ -3,6 +3,7 @@ from functions.common.response import LambdaResponse
 from functions.common.exceptions import (
     NotFoundException
 )
+from functions.crud.schema import UpdateRequest
 import json
 from typing import Optional
 
@@ -25,6 +26,13 @@ def lambda_handler(event, context):
             return LambdaResponse(
                 status_code=200,
                 body=json.dumps(result.model_dump(by_alias=True))
+            ).to_dict()
+        elif http_method == 'PUT' and path == '/update':
+            body = json.loads(event['body'])
+            request = UpdateRequest(**body)
+            container.service.update_url(request)
+            return LambdaResponse(
+                status_code=200
             ).to_dict()
         else:
             return LambdaResponse(
