@@ -17,3 +17,12 @@ class SearchAllResult(BaseModel):
 
 class SearchResult(BaseModel):
     result: list[UrlDto]
+
+class UpdateRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+    hash_value: str = Field(..., serialization_alias='hash', alias='hash')
+    origin_url: str = Field(..., serialization_alias='ou', alias='originUrl')
+    created_at: int = Field(..., serialization_alias='ca', alias='createdAt')
+    count: int = Field(default=0)
+    on: bool = Field(default=True)
+    title: Optional[str] = Field(default=None, serialization_alias='ti')
