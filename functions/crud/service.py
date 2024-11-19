@@ -1,5 +1,5 @@
 from functions.crud.adapter import CrudPort
-from functions.crud.schema import SearchAllResult, SearchResult, UrlDto
+from functions.crud.schema import SearchAllResult, SearchResult, UrlDto, UpdateRequest
 from functions.common.exceptions import NotFoundException
 from typing import Optional
 
@@ -34,3 +34,6 @@ class CrudService:
                 raise NotFoundException
         else:
             raise NotFoundException
+        
+    def update_url(self, update_request: UpdateRequest) -> None:
+        self._adapter.save(update_request)
