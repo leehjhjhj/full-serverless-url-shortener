@@ -15,6 +15,6 @@ class AlreadyExistException(Exception):
 
 
 class TooLongExceiption(Exception):
-    def __init__(self, message="Hopong hash too long"):
+    def __init__(self, message="Hoping hash too long"):
         self.message = message
         super().__init__(self.message)
