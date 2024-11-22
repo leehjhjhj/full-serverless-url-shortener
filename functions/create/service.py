@@ -26,11 +26,11 @@ class CreatetService:
         return hash_value
 
     def _make_hash(self) -> str:
-        CHARSET = '23456789' + 'ABCDEFGHJKLMNPQRSTUVWXYZ' + 'abcdefghjkmnpqrstuvwxyz'
+        CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
         timestamp = self._get_epoch_milliseconds()
         
-        timestamp_part = timestamp % (10 ** 7)
-        random_part = random.randint(0, 9999)
+        timestamp_part = timestamp % (10 ** 5)
+        random_part = random.randint(0, 9999999)
         
         combined = (timestamp_part * 10000) + random_part
         result = []
