@@ -6,16 +6,16 @@ Description: >
 Parameters:
   DomainName:
     Type: String
-    Default: 
+    Default: tmm.im
   APIDomainName:
     Type: String
-    Default: 
+    Default: api.tmm.im
   HostedZoneName:
     Type: String
-    Default: 
+    Default: tmm.im.
   CertificateArn:
     Type: String
-    Default: 
+    Default: arn:aws:acm:ap-northeast-2:831576238138:certificate/09ae0b33-6f2a-406a-808e-3cfbf26b1a1b
     Description: ARN of ACM certificate
   TableName:
     Type: String

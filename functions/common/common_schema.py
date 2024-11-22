@@ -10,3 +10,4 @@ class UrlSchema(BaseModel):
     count: int = Field(default=0, serialization_alias='ct', alias='ct')
     on: bool = Field(default=True)
     title: Optional[str] = Field(default=None, serialization_alias='ti', alias='ti')
+    url_type : str = Field(..., serialization_alias='tp', alias='tp')

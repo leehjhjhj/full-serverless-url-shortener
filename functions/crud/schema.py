@@ -10,6 +10,7 @@ class UrlDto(BaseModel):
     count: int = Field(default=0, serialization_alias='count', alias='ct')
     on: bool = Field(default=True)
     title: Optional[str] = Field(default=None, serialization_alias='title', alias='ti')
+    url_type: str = Field(..., serialization_alias='urlType', alias='tp')
 
 class SearchAllResult(BaseModel):
     result: list[UrlDto]
@@ -23,9 +24,10 @@ class UpdateRequest(BaseModel):
     hash_value: str = Field(..., serialization_alias='hash', alias='hash')
     origin_url: str = Field(..., serialization_alias='ou', alias='originUrl')
     created_at: int = Field(..., serialization_alias='ca', alias='createdAt')
-    count: int = Field(default=0)
+    count: int = Field(default=0, serialization_alias='ct')
     on: bool = Field(default=True)
     title: Optional[str] = Field(default=None, serialization_alias='ti')
+    url_type: str = Field(..., serialization_alias='tp', alias='urlType')
 
 class DeleteRequest(BaseModel):
     hash_value: str = Field(..., serialization_alias='hash', alias='hash')
