@@ -51,16 +51,20 @@ class CrudDynamoDBPort(CrudPort):
         items: dict = response.get('Items', [])
         return items
     
-    def find_all(self, last_evaluated_key: dict = None) -> tuple[list[Optional[dict]], dict]:
+    def find_all(self, url_type: str, last_evaluated_key: dict = None) -> tuple[list[Optional[dict]], dict]:
         limit: int = 20
         scan_kwargs = {
-            'Limit': limit
+            'Limit': limit,
+            'FilterExpression': 'tp = :tp_val',
+            'ExpressionAttributeValues': {
+                ':tp_val': url_type
+            }
         }
         
         if last_evaluated_key:
             scan_kwargs['ExclusiveStartKey'] = last_evaluated_key
-        response = self._table.scan(**scan_kwargs)
         
+        response = self._table.scan(**scan_kwargs)
         return response.get('Items', []), response.get('LastEvaluatedKey')
     
     def save(self, data: UpdateRequest) -> None:
