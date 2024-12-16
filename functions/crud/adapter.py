@@ -52,7 +52,7 @@ class CrudDynamoDBPort(CrudPort):
         return items
     
     def find_all(self, url_type: str, last_evaluated_key: dict = None) -> tuple[list[Optional[dict]], dict]:
-        limit: int = 20
+        limit: int = 100
         scan_kwargs = {
             'Limit': limit,
             'FilterExpression': 'tp = :tp_val',

@@ -7,7 +7,8 @@ import json
 def lambda_handler(event, context):
     try:
         container = RedirectContainer.get_instance()
-        hash_value = event['pathParameters']['hash']
+        parameters = event.get('pathParameters')
+        hash_value = parameters.get('hash') if parameters else None
         request = RedirectRequest(hash_value=hash_value)
         url = container.service.connect_url(request)
         return LambdaResponse(

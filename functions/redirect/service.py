@@ -8,6 +8,8 @@ class RedirectService:
 
     def connect_url(self, request: RedirectRequest) -> str:
         hash_value = request.hash_value
+        if not hash_value:
+            return "https://takemm.com"
         data = self._adapter.find(hash_value)
         self._check_forbidden(data.on)
         data.count += 1
