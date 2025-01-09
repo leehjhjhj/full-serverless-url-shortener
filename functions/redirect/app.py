@@ -1,5 +1,5 @@
 from functions.redirect.container import RedirectContainer
-from functions.redirect.schema import RedirectRequest
+from functions.redirect.schema import RedirectRequest, RedirectUrlRequest
 from functions.common.response import LambdaResponse
 from functions.common.exceptions import NotFoundException, ForbiddenException
 import json
@@ -8,9 +8,17 @@ def lambda_handler(event, context):
     try:
         container = RedirectContainer.get_instance()
         parameters = event.get('pathParameters')
-        hash_value = parameters.get('hash') if parameters else None
-        request = RedirectRequest(hash_value=hash_value)
-        url = container.service.connect_url(request)
+        if parameters:
+            if parameters.get('hash') and parameters.get('unique_id'):
+                request = RedirectUrlRequest(
+                    type=parameters.get('hash'),
+                    unique_id=parameters.get('unique_id')
+                )
+                url = container.service.connect_type_unique_url(request)
+            else:
+                hash_value = parameters.get('hash')
+                request = RedirectRequest(hash_value=hash_value)
+                url = container.service.connect_hash_url(request)
         return LambdaResponse(
             status_code=302,
             headers={
