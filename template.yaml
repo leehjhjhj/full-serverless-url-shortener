@@ -136,7 +136,13 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /
             Method: GET
-
+        RedirectUrlWithUniqueId:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /{hash}/{unique_id}
+            Method: GET
+        
   CrudFunction:
     Type: AWS::Serverless::Function
     Properties:
