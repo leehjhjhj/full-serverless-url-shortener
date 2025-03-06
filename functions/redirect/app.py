@@ -8,6 +8,7 @@ def lambda_handler(event, context):
     try:
         container = RedirectContainer.get_instance()
         parameters = event.get('pathParameters')
+        url = "https://takemm.com"
         if parameters:
             if parameters.get('hash') and parameters.get('unique_id'):
                 request = RedirectUrlRequest(
