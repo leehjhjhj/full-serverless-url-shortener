@@ -7,3 +7,4 @@ class RedirectRequest(BaseModel):
 class RedirectUrlRequest(BaseModel):
     type: Optional[str] = None
     unique_id: Optional[Union[int, str]] = None
+    event_url: Optional[str] = None

@@ -19,19 +19,35 @@ class RedirectService:
     
     def connect_type_unique_url(self, request: RedirectUrlRequest):
         base_url = "https://takemm.com"
-        full_type: str | None = self._get_url_path_by_type(request.type)
         unique_id: Optional[Union[int, str]] = request.unique_id
-        if not full_type or not unique_id:
+        if not unique_id:
             return base_url
-        return base_url + full_type + str(unique_id)
+        
+        full_type: str | None = self._get_url_path_by_type(request.type, unique_id, request.event_url)
+    
+        if not full_type:
+            return base_url
 
-    def _get_url_path_by_type(self, type: str):
+        return base_url + full_type
+
+    def _get_url_path_by_type(
+        self,
+        type: str,
+        unique_id: Optional[str] = None,
+        event_url: Optional[str] = None
+    ):
+        if type in ("l", "b"):
+            if not event_url:
+                return None
+    
         mapping = {
-            "p": "/prod/view/",
-            "t": "/ticket/view/",
-            "e": "/event/@",
-            "d": "/demand/view/",
-            "r": "/paper/view/"
+            "p": f"/prod/view/{unique_id}",
+            "t": f"/ticket/view/{unique_id}",
+            "e": f"/event/@{unique_id}",
+            "d": f"/demand/view/{unique_id}",
+            "r": f"/paper/view/{unique_id}",
+            "l": f"/event/@{event_url}/timeline/{unique_id}",
+            "b": f"/event/@{event_url}/booth/{unique_id}"
         }
         return mapping.get(type)
     

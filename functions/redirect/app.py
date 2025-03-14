@@ -13,7 +13,8 @@ def lambda_handler(event, context):
             if parameters.get('hash') and parameters.get('unique_id'):
                 request = RedirectUrlRequest(
                     type=parameters.get('hash'),
-                    unique_id=parameters.get('unique_id')
+                    unique_id=parameters.get('unique_id'),
+                    event_url=parameters.get('event_url')
                 )
                 url = container.service.connect_type_unique_url(request)
             else:
