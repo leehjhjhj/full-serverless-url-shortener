@@ -47,7 +47,8 @@ class RedirectService:
             "d": f"/demand/view/{unique_id}",
             "r": f"/paper/view/{unique_id}",
             "l": f"/event/@{event_url}/timeline/{unique_id}",
-            "b": f"/event/@{event_url}/booth/ready/{unique_id}"
+            "br": f"/event/@{event_url}/booth/ready/{unique_id}",
+            "bf": f"/event/@{event_url}/booth/{unique_id}"
         }
         return mapping.get(type)
     
