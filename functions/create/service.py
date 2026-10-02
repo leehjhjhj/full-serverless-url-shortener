@@ -32,10 +32,10 @@ class CreatetService:
         combined = (timestamp * 1000) + random_bits
         result = []
         while combined:
-            combined, remainder = divmod(combined, 62)
+            combined, remainder = divmod(combined, len(CHARSET))
             result.append(CHARSET[remainder])
         
-        base62_str = ''.join(reversed(result))[-7:].rjust(7, '0')
+        base62_str = ''.join(reversed(result))[-7:].rjust(7, CHARSET[0])
         return base62_str
     
     def _check_hoping_hash(self, hoping_hash: str) -> bool:
