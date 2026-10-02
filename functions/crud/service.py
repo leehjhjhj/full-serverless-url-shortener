@@ -7,8 +7,8 @@ class CrudService:
     def __init__(self, adapter: CrudPort):
         self._adapter = adapter
 
-    def get_all_urls(self, url_type: str, last_evaluated_key: Optional[dict]) -> SearchAllResult:
-        results, last_key = self._adapter.find_all(url_type, last_evaluated_key)
+    def get_all_urls(self, url_type: str, limit: int, last_evaluated_key: Optional[dict]) -> SearchAllResult:
+        results, last_key = self._adapter.find_all(url_type, limit, last_evaluated_key)
         return SearchAllResult(
             result=[UrlDto(**result) for result in results],
             last_key=last_key

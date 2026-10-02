@@ -14,7 +14,7 @@ class CrudPort(ABC):
         pass
 
     @abstractmethod
-    def find_all(self, last_evaluated_key: dict = None):
+    def find_all(self, url_type: str, limit: int, last_evaluated_key: dict = None):
         pass
 
     @abstractmethod
@@ -51,8 +51,7 @@ class CrudDynamoDBPort(CrudPort):
         items: dict = response.get('Items', [])
         return items
     
-    def find_all(self, url_type: str, last_evaluated_key: dict = None) -> tuple[list[Optional[dict]], dict]:
-        limit: int = 100
+    def find_all(self, url_type: str, limit: int, last_evaluated_key: dict = None) -> tuple[list[Optional[dict]], dict]:
         scan_kwargs = {
             'Limit': limit,
             'FilterExpression': 'tp = :tp_val',
@@ -62,7 +61,7 @@ class CrudDynamoDBPort(CrudPort):
         }
         
         if last_evaluated_key:
-            scan_kwargs['ExclusiveStartKey'] = last_evaluated_key
+            scan_kwargs['ExclusiveStartKey'] = {'hash': last_evaluated_key}
         
         response = self._table.scan(**scan_kwargs)
         return response.get('Items', []), response.get('LastEvaluatedKey')

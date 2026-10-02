@@ -28,18 +28,14 @@ class CreatetService:
     def _make_hash(self) -> str:
         CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
         timestamp = self._get_epoch_milliseconds()
-        
-        timestamp_part = timestamp % (10 ** 5)
-        random_part = random.randint(0, 9999999)
-        
-        combined = (timestamp_part * 10000) + random_part
+        random_bits = random.randint(0, 999)
+        combined = (timestamp * 1000) + random_bits
         result = []
-        
         while combined:
-            combined, remainder = divmod(combined, len(CHARSET))
+            combined, remainder = divmod(combined, 62)
             result.append(CHARSET[remainder])
         
-        base62_str = ''.join(reversed(result))[-7:].rjust(7, CHARSET[0])
+        base62_str = ''.join(reversed(result))[-7:].rjust(7, '0')
         return base62_str
     
     def _check_hoping_hash(self, hoping_hash: str) -> bool:

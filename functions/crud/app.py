@@ -23,8 +23,9 @@ def lambda_handler(event, context):
         elif http_method == 'POST' and path == '/get-all':
             body: dict = json.loads(event.get('body'))
             url_type = body.get('urlType')
+            limit = body.get('limit')
             last_evaluated_key = body.get('lastEvaluatedKey')
-            result = container.service.get_all_urls(url_type, last_evaluated_key)
+            result = container.service.get_all_urls(url_type, limit, last_evaluated_key)
             return LambdaResponse(
                 status_code=200,
                 body=json.dumps(result.model_dump(by_alias=True))
