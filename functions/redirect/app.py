@@ -3,6 +3,14 @@ from functions.redirect.schema import RedirectRequest, RedirectUrlRequest
 from functions.common.response import LambdaResponse
 from functions.common.exceptions import NotFoundException, ForbiddenException
 import json
+from urllib.parse import urlencode
+
+def _append_query(url: str, event: dict) -> str:
+    params = event.get('multiValueQueryStringParameters')
+    if not params:
+        return url
+    query = urlencode(params, doseq=True)
+    return f"{url}{'&' if '?' in url else '?'}{query}"
 
 def lambda_handler(event, context):
     try:
@@ -21,6 +29,7 @@ def lambda_handler(event, context):
                 hash_value = parameters.get('hash')
                 request = RedirectRequest(hash_value=hash_value)
                 url = container.service.connect_hash_url(request)
+        url = _append_query(url, event)
         return LambdaResponse(
             status_code=302,
             headers={
